@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coder Prompter Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="dark">
+  <div class="page-shell">
+    <div class="backdrop backdrop-left"></div>
+    <div class="backdrop backdrop-right"></div>
+
+    <header class="hero">
+      <div class="hero-copy">
+        <div class="brand-row">
+          <p class="eyebrow">Coder Prompter Studio</p>
+          <div class="brand-actions">
+            <span class="status-pill">Prompt Engine Live</span>
+            <div class="theme-switch" role="group" aria-label="Pilih tema warna">
+              <button type="button" class="theme-option is-selected" data-theme-option="dark" aria-pressed="true">Dark</button>
+              <button type="button" class="theme-option" data-theme-option="light" aria-pressed="false">Light</button>
+            </div>
+          </div>
+        </div>
+        <div class="hero-badges">
+          <span class="hero-badge">Modern SaaS</span>
+          <span class="hero-badge">Corporate Ready</span>
+          <span class="hero-badge">Developer Workflow</span>
+        </div>
+        <h1>Bina prompt lengkap untuk hasilkan sistem, aplikasi atau dashboard dengan lebih tepat.</h1>
+        <p class="hero-text">
+          Masukkan maklumat projek anda, kemudian sistem ini akan susun prompt yang tajam, lengkap dan sesuai
+          untuk dihantar ke mana-mana AI supaya hasil yang diterima lebih jelas, tersusun dan boleh terus dibangunkan.
+        </p>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-card-top">
+          <p class="hero-card-label">Prompt Console</p>
+          <span class="console-state">ready()</span>
+        </div>
+        <div class="stat-grid">
+          <article class="stat">
+            <strong id="fieldCount">0</strong>
+            <span>Input terisi</span>
+          </article>
+          <article class="stat">
+            <strong id="charCount">0</strong>
+            <span>Karakter prompt</span>
+          </article>
+          <article class="stat">
+            <strong id="lineCount">0</strong>
+            <span>Baris prompt</span>
+          </article>
+        </div>
+        <div class="code-preview" aria-hidden="true">
+          <div class="code-preview-bar">
+            <span class="code-dot red"></span>
+            <span class="code-dot amber"></span>
+            <span class="code-dot green"></span>
+          </div>
+          <div class="code-lines">
+            <p class="code-line"><span class="code-key">project</span>: <span class="code-string">"school-system"</span></p>
+            <p class="code-line"><span class="code-key">mode</span>: <span class="code-string">"prompt-generation"</span></p>
+            <p class="code-line"><span class="code-key">status</span>: <span class="code-string">"commercial-grade"</span></p>
+          </div>
+        </div>
+        <p class="hero-note">Semakin lengkap maklumat anda, semakin baik prompt yang dijanakan.</p>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel form-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-tag">Langkah 1</p>
+            <h2>Maklumat Projek</h2>
+          </div>
+          <button class="ghost-button" type="button" id="sampleBtn">Muat Contoh</button>
+        </div>
+
+        <div class="preset-strip" id="presetStrip">
+          <button type="button" class="preset-chip" data-preset="dashboard-sekolah">Dashboard Sekolah</button>
+          <button type="button" class="preset-chip" data-preset="kehadiran-guru">Sistem Kehadiran Guru</button>
+          <button type="button" class="preset-chip" data-preset="kokurikulum">Portal Kokurikulum</button>
+          <button type="button" class="preset-chip" data-preset="rekod-murid">Sistem Rekod Murid</button>
+          <button type="button" class="preset-chip" data-preset="pajsk">Sistem PAJSK</button>
+          <button type="button" class="preset-chip" data-preset="pinjaman-buku">Pinjaman Buku</button>
+        </div>
+
+        <form id="promptForm" class="prompt-form">
+          <div class="form-section">
+            <div class="section-title">
+              <p class="section-tag">Asas</p>
+              <h3>Gambaran utama projek</h3>
+            </div>
+
+            <label class="field">
+              <span>Nama projek</span>
+              <input type="text" name="projectName" placeholder="Contoh: SmartKehadiran Sekolah">
+            </label>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Jenis hasil</span>
+                <select name="outputType">
+                  <option value="sistem pengurusan">Sistem Pengurusan</option>
+                  <option value="dashboard analitik">Dashboard Analitik</option>
+                  <option value="aplikasi web">Aplikasi Web</option>
+                  <option value="portal pengguna">Portal Pengguna</option>
+                  <option value="aplikasi mudah alih">Aplikasi Mudah Alih</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Platform sasaran</span>
+                <select name="platform">
+                  <option value="web responsif">Web Responsif</option>
+                  <option value="desktop dan web">Desktop dan Web</option>
+                  <option value="mudah alih dan web admin">Mudah Alih dan Web Admin</option>
+                  <option value="tablet dan desktop">Tablet dan Desktop</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Mode ikut AI</span>
+                <select name="aiTarget">
+                  <option value="generic">Generic AI</option>
+                  <option value="chatgpt">ChatGPT</option>
+                  <option value="gemini">Gemini</option>
+                  <option value="claude">Claude</option>
+                  <option value="codex">Codex</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Gaya prompt utama</span>
+                <select name="promptStyle">
+                  <option value="produk lengkap">Produk Lengkap</option>
+                  <option value="production-ready code">Production-Ready Code</option>
+                  <option value="langkah demi langkah">Langkah Demi Langkah</option>
+                  <option value="mesra guru bukan teknikal">Mesra Guru Bukan Teknikal</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Siapa pengguna utama?</span>
+              <input type="text" name="targetUsers" placeholder="Contoh: guru, pentadbir sekolah, murid, ibu bapa">
+            </label>
+
+            <label class="field">
+              <span>Matlamat projek</span>
+              <textarea name="mainGoal" rows="4" placeholder="Terangkan apa yang sistem ini perlu capai dan nilai yang ingin diberi kepada pengguna."></textarea>
+            </label>
+
+            <label class="field">
+              <span>Masalah yang ingin diselesaikan</span>
+              <textarea name="problemSolved" rows="4" placeholder="Nyatakan isu semasa, proses manual, data yang berpecah atau kesukaran yang sedang berlaku."></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">
+              <p class="section-tag">Fungsi</p>
+              <h3>Modul dan aliran kerja</h3>
+            </div>
+
+            <label class="field">
+              <span>Ciri utama</span>
+              <textarea name="coreFeatures" rows="5" placeholder="Satu baris satu ciri. Contoh: log masuk berperingkat&#10;rekod kehadiran&#10;notifikasi automatik"></textarea>
+            </label>
+
+            <label class="field">
+              <span>Halaman atau modul yang diperlukan</span>
+              <textarea name="modulesScreens" rows="5" placeholder="Contoh: dashboard utama&#10;modul pengguna&#10;laporan bulanan&#10;tetapan sistem"></textarea>
+            </label>
+
+            <label class="field">
+              <span>Peranan pengguna</span>
+              <textarea name="userRoles" rows="4" placeholder="Contoh: admin sekolah, guru kelas, guru mata pelajaran, pengetua"></textarea>
+            </label>
+
+            <label class="field">
+              <span>Aliran kerja penting</span>
+              <textarea name="workflow" rows="4" placeholder="Terangkan langkah demi langkah proses utama yang perlu berlaku dalam sistem."></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">
+              <p class="section-tag">Data</p>
+              <h3>Maklumat, laporan dan integrasi</h3>
+            </div>
+
+            <label class="field">
+              <span>Data atau entiti utama</span>
+              <textarea name="dataEntities" rows="5" placeholder="Contoh: guru, murid, kelas, rekod kehadiran, mata pelajaran, notifikasi"></textarea>
+            </label>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Laporan yang diperlukan</span>
+                <textarea name="reports" rows="4" placeholder="Contoh: laporan harian, mingguan, bulanan, eksport PDF/Excel"></textarea>
+              </label>
+
+              <label class="field">
+                <span>Integrasi yang diperlukan</span>
+                <textarea name="integrations" rows="4" placeholder="Contoh: Google Sheets, WhatsApp API, emel, QR scanner, SMS"></textarea>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Keperluan keselamatan dan akses</span>
+              <textarea name="security" rows="4" placeholder="Contoh: login selamat, role-based access, audit trail, backup data"></textarea>
+            </label>
+          </div>
+
+          <div class="form-section import-section">
+            <div class="section-title">
+              <div>
+                <p class="section-tag">Import Data</p>
+                <h3>Upload CSV atau Excel</h3>
+              </div>
+              <button type="button" class="ghost-button" id="clearFileBtn">Buang Fail</button>
+            </div>
+
+            <div class="field upload-field">
+              <span>Fail contoh data pengguna</span>
+              <p class="upload-help-text">
+                Upload satu fail contoh supaya sistem boleh menganalisis header dan contoh data sebenar,
+                kemudian jadikan struktur itu sebagai panduan untuk prompt yang dijana.
+              </p>
+              <label class="upload-dropzone" for="datasetFile">
+                <input type="file" id="datasetFile" name="datasetFile" accept=".csv,.xlsx,.xls,.xlsm">
+                <strong>Klik untuk pilih fail CSV atau Excel</strong>
+                <span>Format disokong: .csv, .xlsx, .xls, .xlsm</span>
+              </label>
+            </div>
+
+            <div class="dataset-status-box" id="datasetStatusBox">
+              <p id="fileStatus" class="dataset-status-title">Tiada fail dipilih</p>
+              <p id="fileMeta" class="dataset-status-meta">
+                Sistem akan gunakan header fail sebagai panduan untuk cadangkan jadual, import flow dan paparan data.
+              </p>
+            </div>
+
+            <div class="analysis-grid">
+              <article class="analysis-card">
+                <p class="analysis-label">Header Dikesan</p>
+                <div id="headerChips" class="header-chip-list">
+                  <span class="empty-chip">Belum ada header dianalisis</span>
+                </div>
+              </article>
+
+              <article class="analysis-card">
+                <p class="analysis-label">Sample Data</p>
+                <div id="sampleRows" class="sample-row-list">
+                  <p class="empty-note">Upload fail untuk lihat contoh bacaan data.</p>
+                </div>
+              </article>
+            </div>
+
+            <div class="table-preview-card">
+              <div class="table-preview-head">
+                <p class="analysis-label">Preview Table Dinamik</p>
+                <span id="previewCaption" class="preview-caption">Belum ada struktur fail dikesan</span>
+              </div>
+
+              <div class="table-scroll">
+                <table class="preview-table">
+                  <thead id="previewTableHead"></thead>
+                  <tbody id="previewTableBody">
+                    <tr>
+                      <td>Upload fail CSV atau Excel untuk lihat preview jadual mengikut header sebenar pengguna.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section docs-section">
+            <div class="section-title">
+              <div>
+                <p class="section-tag">Dokumen</p>
+                <h3>Dokumen tambahan dan konteks</h3>
+              </div>
+              <button type="button" class="ghost-button" id="clearDocsBtn">Buang Dokumen</button>
+            </div>
+
+            <label class="field">
+              <span>Nota, SOP atau keperluan tambahan</span>
+              <textarea name="additionalDocsNotes" rows="5" placeholder="Paste teks SOP, syarat sekolah, format laporan, modul sedia ada, arahan pentadbir atau keperluan khas lain di sini."></textarea>
+            </label>
+
+            <div class="field upload-field">
+              <span>Upload dokumen teks tambahan</span>
+              <p class="upload-help-text">
+                Fail teks yang dimuat naik akan diringkaskan dan dimasukkan sebagai konteks tambahan dalam prompt.
+              </p>
+              <label class="upload-dropzone" for="supportDocsFiles">
+                <input type="file" id="supportDocsFiles" name="supportDocsFiles" multiple accept=".txt,.md,.json,.csv">
+                <strong>Klik untuk pilih fail teks tambahan</strong>
+                <span>Format disokong: .txt, .md, .json, .csv</span>
+              </label>
+            </div>
+
+            <div class="analysis-card docs-card">
+              <p class="analysis-label">Ringkasan dokumen tambahan</p>
+              <div id="docsSummaryList" class="docs-summary-list">
+                <p class="empty-note">Belum ada dokumen tambahan dimasukkan.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">
+              <p class="section-tag">Teknikal</p>
+              <h3>Reka bentuk, teknologi dan had</h3>
+            </div>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Teknologi pilihan</span>
+                <input type="text" name="techStack" placeholder="Contoh: HTML, CSS, JavaScript, Firebase">
+              </label>
+
+              <label class="field">
+                <span>Gaya UI/UX</span>
+                <input type="text" name="designStyle" placeholder="Contoh: moden, mesra guru, jelas, profesional">
+              </label>
+            </div>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Bahasa output AI</span>
+                <select name="responseLanguage">
+                  <option value="Bahasa Melayu">Bahasa Melayu</option>
+                  <option value="Bahasa Inggeris">Bahasa Inggeris</option>
+                  <option value="Dwibahasa (BM dan BI)">Dwibahasa (BM dan BI)</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Tahap perincian</span>
+                <select name="detailLevel">
+                  <option value="sangat terperinci">Sangat Terperinci</option>
+                  <option value="terperinci">Terperinci</option>
+                  <option value="padat tetapi lengkap">Padat tetapi Lengkap</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Had, kekangan atau arahan khas</span>
+              <textarea name="constraints" rows="4" placeholder="Contoh: mesti mudah digunakan oleh guru, kos rendah, sesuai untuk sekolah, tidak terlalu kompleks"></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">
+              <p class="section-tag">Hasil</p>
+              <h3>Apa yang AI perlu berikan</h3>
+            </div>
+
+            <label class="field">
+              <span>Hasil akhir yang dikehendaki</span>
+              <textarea name="deliverables" rows="5" placeholder="Contoh: kod lengkap, struktur folder, langkah setup, sample data, panduan deployment, testing checklist"></textarea>
+            </label>
+
+            <div class="field-grid two">
+              <label class="field">
+                <span>Cadangan deployment</span>
+                <input type="text" name="deployment" placeholder="Contoh: Netlify, Vercel, Firebase Hosting">
+              </label>
+
+              <label class="field">
+                <span>Kriteria kejayaan</span>
+                <input type="text" name="successCriteria" placeholder="Contoh: boleh terus digunakan, responsif, mudah diselenggara">
+              </label>
+            </div>
+
+            <div class="toggle-grid">
+              <label class="toggle-card">
+                <input type="checkbox" name="includeSchema" checked>
+                <span>Sertakan reka bentuk pangkalan data</span>
+              </label>
+              <label class="toggle-card">
+                <input type="checkbox" name="includeSampleData" checked>
+                <span>Sertakan sample data</span>
+              </label>
+              <label class="toggle-card">
+                <input type="checkbox" name="includeTestCases" checked>
+                <span>Sertakan senarai ujian</span>
+              </label>
+              <label class="toggle-card">
+                <input type="checkbox" name="includeStepGuide" checked>
+                <span>Sertakan langkah membina sistem</span>
+              </label>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel output-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-tag">Langkah 2</p>
+            <h2>Prompt Dijana</h2>
+          </div>
+          <div class="action-row">
+            <button class="ghost-button" type="button" id="resetBtn">Reset</button>
+            <button class="ghost-button" type="button" id="downloadBtn">Muat Turun .txt</button>
+            <button class="primary-button" type="button" id="copyBtn">Salin Prompt</button>
+          </div>
+        </div>
+
+        <div class="output-intro">
+          <p>Prompt ini dibina supaya AI faham konteks, skop, modul, data, reka bentuk dan hasil yang anda perlukan.</p>
+          <button type="button" id="generateBtn" class="secondary-button">Jana Semula Prompt</button>
+        </div>
+
+        <div class="prompt-mode-strip" id="promptTabStrip">
+          <button type="button" class="prompt-tab is-active" data-prompt-tab="full">Prompt Penuh</button>
+          <button type="button" class="prompt-tab" data-prompt-tab="concise">Versi Ringkas</button>
+          <button type="button" class="prompt-tab" data-prompt-tab="production">Versi Production</button>
+          <button type="button" class="prompt-tab" data-prompt-tab="checklist">Checklist</button>
+        </div>
+
+        <div class="quality-card" id="qualityCard">
+          <div class="quality-head">
+            <div>
+              <p class="analysis-label">Prompt Quality Checker</p>
+              <p id="qualitySummary" class="dataset-status-meta">Sistem akan menilai kekuatan prompt berdasarkan input anda.</p>
+            </div>
+            <div class="quality-score-wrap">
+              <strong id="qualityScore">0</strong>
+              <span>/100</span>
+            </div>
+          </div>
+          <div id="qualityIssues" class="quality-issues">
+            <span class="empty-chip">Belum ada analisis kualiti</span>
+          </div>
+        </div>
+
+        <label class="field output-field">
+          <span id="promptOutputLabel">Teks prompt</span>
+          <textarea id="generatedPrompt" rows="26" readonly></textarea>
+        </label>
+
+        <div class="preview-card">
+          <p class="preview-label">Rumusan pintar</p>
+          <div id="summaryChips" class="summary-chips"></div>
+        </div>
+
+        <div class="history-card">
+          <div class="table-preview-head">
+            <div>
+              <p class="analysis-label">History Projek</p>
+              <p class="dataset-status-meta">Simpan versi prompt yang penting untuk dibuka semula kemudian.</p>
+            </div>
+            <button type="button" class="ghost-button" id="saveHistoryBtn">Simpan Ke History</button>
+          </div>
+          <div id="historyList" class="history-list">
+            <p class="empty-note">Belum ada history projek disimpan.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="panel deploy-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="section-tag">Langkah 3</p>
+          <h2>HTML Ke Folder Deploy</h2>
+        </div>
+        <div class="action-row">
+          <button class="ghost-button" type="button" id="syncFolderNameBtn">Guna Nama Projek</button>
+          <button class="ghost-button" type="button" id="clearDeployBtn">Kosongkan</button>
+        </div>
+      </div>
+
+      <div class="deploy-grid">
+        <div class="deploy-editor">
+          <label class="field">
+            <span>Nama folder sistem</span>
+            <input type="text" id="packageFolderName" name="packageFolderName" placeholder="Contoh: smart-kehadiran-sekolah">
+          </label>
+
+          <label class="field deploy-code-field">
+            <span>Kod HTML penuh</span>
+            <textarea id="deployHtmlInput" name="deployHtmlInput" rows="18" placeholder="Paste seluruh kod HTML hasil AI anda di sini, termasuk &lt;!DOCTYPE html&gt; hingga &lt;/html&gt;"></textarea>
+          </label>
+
+          <div class="field-grid two deploy-split-grid">
+            <label class="field deploy-code-field compact">
+              <span>Kod CSS tambahan</span>
+              <textarea id="deployCssInput" name="deployCssInput" rows="12" placeholder="Jika AI beri style.css berasingan, paste di sini. Jika kosong, sistem anggap tiada fail CSS berasingan."></textarea>
+            </label>
+
+            <label class="field deploy-code-field compact">
+              <span>Kod JavaScript tambahan</span>
+              <textarea id="deployJsInput" name="deployJsInput" rows="12" placeholder="Jika AI beri app.js berasingan, paste di sini. Jika kosong, sistem anggap tiada fail JS berasingan."></textarea>
+            </label>
+          </div>
+
+          <div class="field upload-field">
+            <span>Asset tambahan untuk folder deploy</span>
+            <p class="upload-help-text">
+              Anda boleh tambah imej, ikon atau fail sokongan lain. Sistem akan letakkan fail ini dalam folder `assets`.
+            </p>
+            <label class="upload-dropzone" for="deployAssetFiles">
+              <input type="file" id="deployAssetFiles" name="deployAssetFiles" multiple accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.ico,.json,.txt,.pdf">
+              <strong>Klik untuk pilih asset tambahan</strong>
+              <span>Contoh: logo, ikon, gambar, fail JSON, PDF atau fail sokongan lain</span>
+            </label>
+          </div>
+
+          <div class="analysis-card docs-card">
+            <p class="analysis-label">Asset deploy dikesan</p>
+            <div id="deployAssetsList" class="docs-summary-list">
+              <p class="empty-note">Belum ada asset tambahan dipilih.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="deploy-sidebar">
+          <div class="deploy-status-card" id="deployStatusCard">
+            <p class="analysis-label">Status Deploy Pack</p>
+            <p id="deployStatusTitle" class="dataset-status-title">Belum ada kod HTML dipaste</p>
+            <p id="deployStatusMeta" class="dataset-status-meta">
+              Paste fail HTML penuh, kemudian sistem akan sediakan folder deploy dengan `index.html` secara automatik.
+            </p>
+            <div id="deployFacts" class="deploy-facts">
+              <span class="empty-chip">Folder belum dijana</span>
+            </div>
+          </div>
+
+          <div class="deploy-action-card">
+            <p class="analysis-label">Tindakan Siap Deploy</p>
+            <p class="deploy-action-text">
+              Sistem akan baca ruang `Cadangan deployment`. Jika cikgu tulis `Netlify`, folder deploy akan ikut sasaran itu. Jika tiada sasaran jelas, sistem kekalkan pakej paling ringkas dengan `index.html` sahaja.
+            </p>
+            <div class="deploy-button-stack">
+              <button class="primary-button" type="button" id="saveFolderDirectBtn">Simpan Terus Ke Folder</button>
+              <button class="ghost-button" type="button" id="downloadFolderZipBtn">Muat Turun Folder ZIP</button>
+            </div>
+            <p id="deploySupportNote" class="deploy-support-note">
+              Simpan terus ke folder disyorkan. ZIP kekal tersedia sebagai pilihan kedua.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="extractor-panel">
+        <div class="table-preview-head">
+          <div>
+            <p class="section-tag">Code Extractor</p>
+            <h3>Ekstrak HTML, CSS dan JS dari jawapan AI</h3>
+          </div>
+          <div class="action-row">
+            <button class="ghost-button" type="button" id="clearExtractorBtn">Kosongkan Extractor</button>
+            <button class="secondary-button" type="button" id="extractCodeBtn">Ekstrak Code</button>
+          </div>
+        </div>
+
+        <div class="deploy-grid extractor-grid">
+          <div class="deploy-editor">
+            <label class="field deploy-code-field">
+              <span>Paste jawapan penuh AI</span>
+              <textarea id="aiResponseInput" name="aiResponseInput" rows="16" placeholder="Paste seluruh jawapan AI di sini. Sistem akan cuba kesan code block HTML, CSS dan JavaScript secara automatik."></textarea>
+            </label>
+
+            <div class="deploy-button-stack inline-actions">
+              <button class="ghost-button" type="button" id="useExtractedHtmlBtn">Masukkan HTML Sahaja</button>
+              <button class="ghost-button" type="button" id="useExtractedSplitBtn">Masukkan Split Files</button>
+            </div>
+          </div>
+
+          <div class="deploy-sidebar">
+            <div class="deploy-status-card" id="extractStatusCard">
+              <p class="analysis-label">Status Ekstraksi</p>
+              <p id="extractStatusTitle" class="dataset-status-title">Belum ada jawapan AI dianalisis</p>
+              <p id="extractStatusMeta" class="dataset-status-meta">
+                Sistem akan cari code block HTML, CSS dan JavaScript, kemudian sediakan fail berasingan jika ada.
+              </p>
+              <div id="extractFacts" class="deploy-facts">
+                <span class="empty-chip">Tiada code block dikesan lagi</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-grid two deploy-split-grid">
+          <label class="field deploy-code-field compact">
+            <span>HTML diekstrak</span>
+            <textarea id="extractedHtmlOutput" rows="12" readonly placeholder="HTML yang dikesan akan muncul di sini."></textarea>
+          </label>
+
+          <label class="field deploy-code-field compact">
+            <span>CSS diekstrak</span>
+            <textarea id="extractedCssOutput" rows="12" readonly placeholder="CSS yang dikesan akan muncul di sini."></textarea>
+          </label>
+        </div>
+
+        <label class="field deploy-code-field compact">
+          <span>JavaScript diekstrak</span>
+          <textarea id="extractedJsOutput" rows="10" readonly placeholder="JavaScript yang dikesan akan muncul di sini."></textarea>
+        </label>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>Design by: Akmal Nasir</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

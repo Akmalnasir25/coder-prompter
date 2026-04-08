@@ -2489,7 +2489,7 @@ async function copyPrompt() {
 
 function downloadPrompt() {
   const prompt = getActivePromptText();
-  const fileName = `${sanitizeSystemName(readFormData().projectName || "coder-prompter-prompt", "coder-prompter-prompt")}.txt`;
+  const fileName = `${sanitizeSystemName(readFormData().projectName || "coder-prompter-studio-prompt", "coder-prompter-studio-prompt")}.txt`;
 
   const blob = new Blob([prompt], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);

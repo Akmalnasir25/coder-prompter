@@ -1,4 +1,4 @@
-# Coder Prompter Untuk Guru
+# Coder Prompter Studio
 
 Aplikasi web statik untuk membantu guru dan pengguna bukan teknikal menjana prompt yang lengkap, terperinci dan terus boleh digunakan pada mana-mana AI bagi membina sistem, aplikasi, dashboard atau portal sekolah.
 

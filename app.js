@@ -46,6 +46,12 @@ const qualityScore = document.getElementById("qualityScore");
 const qualityIssues = document.getElementById("qualityIssues");
 const saveHistoryBtn = document.getElementById("saveHistoryBtn");
 const historyList = document.getElementById("historyList");
+const localProfileNameInput = document.getElementById("localProfileName");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+const clearProfileBtn = document.getElementById("clearProfileBtn");
+const activeProfileStatus = document.getElementById("activeProfileStatus");
+const profileChips = document.getElementById("profileChips");
+const historyOwnerNote = document.getElementById("historyOwnerNote");
 const aiResponseInput = document.getElementById("aiResponseInput");
 const extractCodeBtn = document.getElementById("extractCodeBtn");
 const clearExtractorBtn = document.getElementById("clearExtractorBtn");
@@ -67,6 +73,9 @@ const legacyStorageKeys = {
 const storageKey = "coder-prompter-studio-form";
 const themeStorageKey = "coder-prompter-studio-theme";
 const historyStorageKey = "coder-prompter-studio-history";
+const profileStorageKey = "coder-prompter-studio-active-profile";
+const profilesStorageKey = "coder-prompter-studio-profiles";
+const legacyProfileMigrationKey = "coder-prompter-studio-profile-migrated";
 
 const fieldGuidance = {
   projectName: {
@@ -235,6 +244,7 @@ let promptVariants = {
   production: "",
   checklist: ""
 };
+let activeLocalProfile = null;
 let additionalDocsState = createEmptyAdditionalDocsState();
 let deployAssetsState = [];
 let extractedCodeState = createEmptyExtractedCodeState();
@@ -267,6 +277,172 @@ function migrateLegacyStorageKeys() {
 function initializeTheme() {
   const storedTheme = localStorage.getItem(themeStorageKey);
   applyTheme(storedTheme || document.body.dataset.theme || "dark");
+}
+
+function getScopedDraftStorageKey(profileId = activeLocalProfile?.id) {
+  return profileId ? `${storageKey}:${profileId}` : storageKey;
+}
+
+function getScopedHistoryStorageKey(profileId = activeLocalProfile?.id) {
+  return profileId ? `${historyStorageKey}:${profileId}` : "";
+}
+
+function getStoredProfiles() {
+  try {
+    const items = JSON.parse(localStorage.getItem(profilesStorageKey) || "[]");
+    return Array.isArray(items) ? items.filter((item) => item?.id && item?.displayName) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveStoredProfiles(items) {
+  localStorage.setItem(profilesStorageKey, JSON.stringify(items.slice(0, 12)));
+}
+
+function upsertStoredProfile(profile) {
+  const nextItems = getStoredProfiles().filter((item) => item.id !== profile.id);
+  nextItems.unshift({
+    ...profile,
+    updatedAt: new Date().toISOString()
+  });
+  saveStoredProfiles(nextItems);
+}
+
+function buildLocalProfile(rawValue) {
+  const displayName = String(rawValue || "").trim();
+
+  return {
+    id: sanitizeSystemName(displayName, `profil-${Date.now()}`),
+    displayName
+  };
+}
+
+function migrateLegacyProjectDataToProfile(profileId) {
+  if (!profileId || localStorage.getItem(legacyProfileMigrationKey) === "true") {
+    return;
+  }
+
+  let hasMigrated = false;
+  const scopedDraftKey = getScopedDraftStorageKey(profileId);
+  const scopedHistoryKey = getScopedHistoryStorageKey(profileId);
+
+  if (!localStorage.getItem(scopedDraftKey) && localStorage.getItem(storageKey)) {
+    localStorage.setItem(scopedDraftKey, localStorage.getItem(storageKey));
+    hasMigrated = true;
+  }
+
+  if (scopedHistoryKey && !localStorage.getItem(scopedHistoryKey) && localStorage.getItem(historyStorageKey)) {
+    localStorage.setItem(scopedHistoryKey, localStorage.getItem(historyStorageKey));
+    hasMigrated = true;
+  }
+
+  if (hasMigrated) {
+    localStorage.setItem(legacyProfileMigrationKey, "true");
+  }
+}
+
+function resetWorkspaceControls() {
+  form.reset();
+  form.elements.namedItem("includeSchema").checked = true;
+  form.elements.namedItem("includeSampleData").checked = true;
+  form.elements.namedItem("includeTestCases").checked = true;
+  form.elements.namedItem("includeStepGuide").checked = true;
+  promptVariantMode = "full";
+  clearPresetSelection();
+  clearDatasetSelection();
+  clearSupportDocs();
+  clearDeployBuilder();
+  clearExtractor();
+}
+
+function renderProfileState() {
+  const profiles = getStoredProfiles();
+  const hasActiveProfile = Boolean(activeLocalProfile?.id);
+
+  localProfileNameInput.value = hasActiveProfile ? activeLocalProfile.displayName : "";
+  activeProfileStatus.textContent = hasActiveProfile
+    ? `Profil aktif: ${activeLocalProfile.displayName}. Draft dan history kini dibaca khas untuk profil ini pada browser ini.`
+    : "Belum ada profil aktif. Simpan nama pengguna atau kod guru supaya draft dan history dipisahkan ikut pemilik.";
+  historyOwnerNote.textContent = hasActiveProfile
+    ? `History yang dipaparkan sekarang milik ${activeLocalProfile.displayName} pada browser ini.`
+    : "Pilih atau simpan profil lokal dahulu untuk melihat history milik pengguna tertentu.";
+  saveHistoryBtn.disabled = !hasActiveProfile;
+  clearProfileBtn.disabled = !hasActiveProfile;
+  saveHistoryBtn.title = hasActiveProfile ? "" : "Simpan profil dahulu untuk aktifkan history";
+
+  profileChips.innerHTML = profiles.length
+    ? profiles.map((profile) => `
+      <button
+        type="button"
+        class="profile-chip ${profile.id === activeLocalProfile?.id ? "is-active" : ""}"
+        data-profile-id="${escapeHtml(profile.id)}"
+      >
+        <span class="profile-chip-label">${escapeHtml(profile.displayName)}</span>
+      </button>
+    `).join("")
+    : '<span class="empty-chip">Belum ada profil disimpan pada browser ini.</span>';
+}
+
+function switchActiveProfile(profile) {
+  activeLocalProfile = profile?.id ? profile : null;
+
+  if (activeLocalProfile) {
+    upsertStoredProfile(activeLocalProfile);
+    localStorage.setItem(profileStorageKey, JSON.stringify(activeLocalProfile));
+    migrateLegacyProjectDataToProfile(activeLocalProfile.id);
+  } else {
+    localStorage.removeItem(profileStorageKey);
+  }
+
+  resetWorkspaceControls();
+  loadDraft();
+  renderProfileState();
+  renderHistory();
+  generatePrompt();
+}
+
+function saveProfileFromInput() {
+  const profileName = localProfileNameInput.value.trim();
+
+  if (!profileName) {
+    localProfileNameInput.focus();
+    activeProfileStatus.textContent = "Masukkan nama pengguna atau kod guru terlebih dahulu sebelum simpan profil.";
+    return;
+  }
+
+  switchActiveProfile(buildLocalProfile(profileName));
+
+  const originalText = saveProfileBtn.textContent;
+  saveProfileBtn.textContent = "Profil Aktif";
+
+  window.setTimeout(() => {
+    saveProfileBtn.textContent = originalText;
+  }, 1400);
+}
+
+function initializeLocalProfile() {
+  try {
+    const rawProfile = localStorage.getItem(profileStorageKey);
+
+    if (!rawProfile) {
+      renderProfileState();
+      return;
+    }
+
+    const storedProfile = JSON.parse(rawProfile);
+
+    if (storedProfile?.id && storedProfile?.displayName) {
+      activeLocalProfile = storedProfile;
+      upsertStoredProfile(storedProfile);
+      migrateLegacyProjectDataToProfile(storedProfile.id);
+    }
+  } catch (error) {
+    localStorage.removeItem(profileStorageKey);
+    activeLocalProfile = null;
+  }
+
+  renderProfileState();
 }
 
 function sanitizeSystemName(rawValue, fallback = "sistem-baru") {
@@ -2308,18 +2484,35 @@ function renderQualityAnalysis(values) {
 }
 
 function getHistoryItems() {
+  const scopedHistoryKey = getScopedHistoryStorageKey();
+
+  if (!scopedHistoryKey) {
+    return [];
+  }
+
   try {
-    return JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
+    return JSON.parse(localStorage.getItem(scopedHistoryKey) || "[]");
   } catch (error) {
     return [];
   }
 }
 
 function saveHistoryItems(items) {
-  localStorage.setItem(historyStorageKey, JSON.stringify(items.slice(0, 20)));
+  const scopedHistoryKey = getScopedHistoryStorageKey();
+
+  if (!scopedHistoryKey) {
+    return;
+  }
+
+  localStorage.setItem(scopedHistoryKey, JSON.stringify(items.slice(0, 20)));
 }
 
 function renderHistory() {
+  if (!activeLocalProfile?.id) {
+    historyList.innerHTML = '<p class="empty-note">Simpan atau pilih profil lokal dahulu untuk melihat history milik pengguna itu.</p>';
+    return;
+  }
+
   const items = getHistoryItems();
 
   historyList.innerHTML = items.length
@@ -2327,7 +2520,7 @@ function renderHistory() {
       <article class="history-item">
         <div>
           <strong>${escapeHtml(item.projectName)}</strong>
-          <p>${escapeHtml(item.createdAtLabel)} | ${escapeHtml(item.aiTargetLabel)} | ${escapeHtml(item.promptVariantLabel)}</p>
+          <p>${escapeHtml(item.createdAtLabel)} | ${escapeHtml(item.profileLabel || activeLocalProfile.displayName)} | ${escapeHtml(item.aiTargetLabel)} | ${escapeHtml(item.promptVariantLabel)}</p>
         </div>
         <div class="history-actions">
           <button type="button" class="ghost-button history-load-btn" data-history-id="${item.id}">Buka</button>
@@ -2339,12 +2532,19 @@ function renderHistory() {
 }
 
 function saveCurrentProjectToHistory() {
+  if (!activeLocalProfile?.id) {
+    activeProfileStatus.textContent = "Simpan profil lokal dahulu sebelum simpan history supaya sistem tahu pemilik data ini.";
+    return;
+  }
+
   const values = readFormData();
   const items = getHistoryItems();
   const snapshot = {
     id: `${Date.now()}`,
     createdAt: new Date().toISOString(),
     createdAtLabel: new Date().toLocaleString("ms-MY"),
+    profileId: activeLocalProfile.id,
+    profileLabel: activeLocalProfile.displayName,
     projectName: values.projectName || "Projek tanpa nama",
     aiTargetLabel: getAiTargetLabel(values.aiTarget),
     promptVariantLabel: getPromptVariantLabel(promptVariantMode),
@@ -2450,22 +2650,26 @@ function updateStats(promptText, values) {
 }
 
 function saveDraft(values) {
-  localStorage.setItem(storageKey, JSON.stringify(values));
+  localStorage.setItem(getScopedDraftStorageKey(), JSON.stringify(values));
 }
 
 function loadDraft() {
-  const raw = localStorage.getItem(storageKey);
+  const scopedDraftKey = getScopedDraftStorageKey();
+  const raw = localStorage.getItem(scopedDraftKey);
 
   if (!raw) {
-    return;
+    return false;
   }
 
   try {
     const values = JSON.parse(raw);
-    applyValues(values);
+    applyValues(values, false);
+    return true;
   } catch (error) {
-    localStorage.removeItem(storageKey);
+    localStorage.removeItem(scopedDraftKey);
   }
+
+  return false;
 }
 
 function generatePrompt() {
@@ -2520,18 +2724,8 @@ function downloadPrompt() {
 }
 
 function resetForm() {
-  form.reset();
-  form.elements.namedItem("includeSchema").checked = true;
-  form.elements.namedItem("includeSampleData").checked = true;
-  form.elements.namedItem("includeTestCases").checked = true;
-  form.elements.namedItem("includeStepGuide").checked = true;
-  promptVariantMode = "full";
-  clearPresetSelection();
-  clearDatasetSelection();
-  clearSupportDocs();
-  clearDeployBuilder();
-  clearExtractor();
-  localStorage.removeItem(storageKey);
+  resetWorkspaceControls();
+  localStorage.removeItem(getScopedDraftStorageKey());
   generatePrompt();
 }
 
@@ -2566,11 +2760,11 @@ themeOptions.forEach((button) => {
 migrateLegacyStorageKeys();
 initializeTheme();
 enhanceFieldGuidance();
+initializeLocalProfile();
 renderDatasetPreview();
 renderSupportDocs();
 renderDeployAssets();
 renderExtractedCode();
-renderHistory();
 updateDeployStatus();
 form.addEventListener("input", generatePrompt);
 generateBtn.addEventListener("click", generatePrompt);
@@ -2656,6 +2850,29 @@ extractCodeBtn.addEventListener("click", () => {
 clearExtractorBtn.addEventListener("click", clearExtractor);
 useExtractedHtmlBtn.addEventListener("click", applyExtractedHtmlOnly);
 useExtractedSplitBtn.addEventListener("click", applyExtractedSplitFiles);
+saveProfileBtn.addEventListener("click", saveProfileFromInput);
+clearProfileBtn.addEventListener("click", () => {
+  switchActiveProfile(null);
+});
+localProfileNameInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    saveProfileFromInput();
+  }
+});
+profileChips.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-profile-id]");
+
+  if (!button?.dataset.profileId) {
+    return;
+  }
+
+  const targetProfile = getStoredProfiles().find((profile) => profile.id === button.dataset.profileId);
+
+  if (targetProfile) {
+    switchActiveProfile(targetProfile);
+  }
+});
 copyBtn.addEventListener("click", () => {
   copyPrompt().catch(() => {
     copyBtn.textContent = "Salin Manual";
@@ -2664,6 +2881,11 @@ copyBtn.addEventListener("click", () => {
 downloadBtn.addEventListener("click", downloadPrompt);
 resetBtn.addEventListener("click", resetForm);
 saveHistoryBtn.addEventListener("click", () => {
+  if (!activeLocalProfile?.id) {
+    saveProfileBtn.focus();
+    return;
+  }
+
   saveCurrentProjectToHistory();
   const originalText = saveHistoryBtn.textContent;
   saveHistoryBtn.textContent = "Tersimpan";
@@ -2687,4 +2909,5 @@ historyList.addEventListener("click", (event) => {
 });
 
 loadDraft();
+renderHistory();
 generatePrompt();

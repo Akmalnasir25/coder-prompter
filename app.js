@@ -59,9 +59,14 @@ const extractedHtmlOutput = document.getElementById("extractedHtmlOutput");
 const extractedCssOutput = document.getElementById("extractedCssOutput");
 const extractedJsOutput = document.getElementById("extractedJsOutput");
 
-const storageKey = "coder-prompter-form";
-const themeStorageKey = "coder-prompter-theme";
-const historyStorageKey = "coder-prompter-history";
+const legacyStorageKeys = {
+  draft: "coder-prompter-form",
+  theme: "coder-prompter-theme",
+  history: "coder-prompter-history"
+};
+const storageKey = "coder-prompter-studio-form";
+const themeStorageKey = "coder-prompter-studio-theme";
+const historyStorageKey = "coder-prompter-studio-history";
 
 const fieldGuidance = {
   projectName: {
@@ -242,6 +247,20 @@ function applyTheme(theme) {
     const isSelected = button.dataset.themeOption === resolvedTheme;
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
+function migrateLegacyStorageKeys() {
+  const mappings = [
+    [legacyStorageKeys.draft, storageKey],
+    [legacyStorageKeys.theme, themeStorageKey],
+    [legacyStorageKeys.history, historyStorageKey]
+  ];
+
+  mappings.forEach(([oldKey, newKey]) => {
+    if (!localStorage.getItem(newKey) && localStorage.getItem(oldKey)) {
+      localStorage.setItem(newKey, localStorage.getItem(oldKey));
+    }
   });
 }
 
@@ -2544,6 +2563,7 @@ themeOptions.forEach((button) => {
   });
 });
 
+migrateLegacyStorageKeys();
 initializeTheme();
 enhanceFieldGuidance();
 renderDatasetPreview();

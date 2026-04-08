@@ -1,6 +1,16 @@
 # Coder Prompter Studio
 
+[![Live on Firebase](https://img.shields.io/badge/Firebase-Live-orange?style=flat-square&logo=firebase)](https://coder-prompter.web.app)
+[![Deploy Workflow](https://img.shields.io/github/actions/workflow/status/Akmalnasir25/coder-prompter/firebase-hosting-merge.yml?branch=main&style=flat-square&label=Auto%20Deploy)](https://github.com/Akmalnasir25/coder-prompter/actions/workflows/firebase-hosting-merge.yml)
+[![Repository](https://img.shields.io/badge/GitHub-coder--prompter-181717?style=flat-square&logo=github)](https://github.com/Akmalnasir25/coder-prompter)
+
 Aplikasi web statik untuk membantu guru dan pengguna bukan teknikal menjana prompt yang lengkap, terperinci dan terus boleh digunakan pada mana-mana AI bagi membina sistem, aplikasi, dashboard atau portal sekolah.
+
+## Pautan
+
+- Live app: `https://coder-prompter.web.app`
+- Repository: `https://github.com/Akmalnasir25/coder-prompter`
+- Brand name: `Coder Prompter Studio`
 
 ## Cara guna
 

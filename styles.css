@@ -520,6 +520,10 @@ button {
   font-size: 1.32rem;
 }
 
+.smart-assist-status {
+  margin: 8px 0 0;
+}
+
 .field,
 .toggle-card {
   position: relative;

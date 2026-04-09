@@ -105,7 +105,10 @@
             <p class="section-tag">Langkah 1</p>
             <h2>Maklumat Projek</h2>
           </div>
-          <button class="ghost-button" type="button" id="sampleBtn">Muat Contoh</button>
+          <div class="action-row">
+            <button class="ghost-button" type="button" id="sampleBtn">Muat Contoh</button>
+            <button class="ghost-button" type="button" id="stepOneResetBtn">Reset</button>
+          </div>
         </div>
 
         <div class="preset-strip" id="presetStrip">
@@ -120,8 +123,11 @@
         <form id="promptForm" class="prompt-form">
           <div class="form-section">
             <div class="section-title">
-              <p class="section-tag">Asas</p>
-              <h3>Gambaran utama projek</h3>
+              <div>
+                <p class="section-tag">Asas</p>
+                <h3>Gambaran utama projek</h3>
+              </div>
+              <button type="button" class="ghost-button" id="smartAssistBtn">Jana Cadangan Pintar</button>
             </div>
 
             <label class="field">
@@ -189,6 +195,10 @@
               <span>Masalah yang ingin diselesaikan</span>
               <textarea name="problemSolved" rows="4" placeholder="Nyatakan isu semasa, proses manual, data yang berpecah atau kesukaran yang sedang berlaku."></textarea>
             </label>
+
+            <p id="smartAssistStatus" class="dataset-status-meta smart-assist-status">
+              Isi maklumat asas projek. Sistem akan cadangkan bahagian Modul, Data dan Teknikal secara automatik, dan anda masih boleh ubah manual.
+            </p>
           </div>
 
           <div class="form-section">
